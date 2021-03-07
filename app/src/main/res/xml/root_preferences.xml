@@ -1,0 +1,20 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/ingredients">
+        <ListPreference
+            app:entries="@array/favorite_ingredients"
+            app:entryValues="@array/favorite_ingredients"
+            app:summary="%s"
+            app:key="ingredient"
+            app:title="Select ingredient"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/mode">
+        <CheckBoxPreference
+            app:defaultValue="false"
+            app:key="color_scheme"
+            app:title="Dark mode"
+            />
+    </PreferenceCategory>
+
+</PreferenceScreen>
