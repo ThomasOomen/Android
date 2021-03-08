@@ -8,13 +8,4 @@
             app:key="ingredient"
             app:title="Select ingredient"/>
     </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/mode">
-        <CheckBoxPreference
-            app:defaultValue="false"
-            app:key="color_scheme"
-            app:title="Dark mode"
-            />
-    </PreferenceCategory>
-
 </PreferenceScreen>

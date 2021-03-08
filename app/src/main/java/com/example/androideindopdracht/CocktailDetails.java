@@ -8,11 +8,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.LruCache;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -22,19 +24,33 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
+import com.android.volley.toolbox.Volley;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class CocktailDetails extends AppCompatActivity {
     private String name, category, instructions, imageSource;
     private int STORAGE_PERMISSION_CODE = 1;
+    private RequestQueue mQueue;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cocktail_details);
 
+        TextView textViewName = (TextView)findViewById(R.id.cocktail_name);
+        TextView textViewCategory = (TextView)findViewById(R.id.cocktail_category);
+        TextView textViewInstructions = (TextView)findViewById(R.id.cocktail_instructions);
+
         Button buttonRequest = findViewById(R.id.button);
+        ToggleButton editTextField = findViewById(R.id.edit_tekst);
+        editTextField.setText("Wijzig instructies");
+
         buttonRequest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -44,22 +60,57 @@ public class CocktailDetails extends AppCompatActivity {
                 } else {
                     requestStoragePermission();
                 }
+            }
+        });
 
+        editTextField.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                boolean on = ((ToggleButton) v).isChecked();
+                if (on) {
+                    textViewInstructions.setEnabled(true);
+                    editTextField.setText("Stop wijzig instructies");
+                } else {
+                    textViewInstructions.setEnabled(false);
+                    editTextField.setText("Wijzig instructies");
+
+                }
             }
         });
 
         this.name = getIntent().getStringExtra("COCKTAIL_NAME");
         this.category = getIntent().getStringExtra("COCKTAIL_CATEGORY");
         this.instructions = getIntent().getStringExtra("COCKTAIL_INSTRUCTION");
-        this.imageSource = getIntent().getStringExtra("COCKTAIL_IMAGE");
+        this.imageSource = getIntent().getStringExtra("COCKTAIL_IMAGESOURCE");
 
-        TextView textViewName = (TextView)findViewById(R.id.cocktail_name);
-        TextView textViewCategory = (TextView)findViewById(R.id.cocktail_category);
-        TextView textViewInstructions = (TextView)findViewById(R.id.cocktail_instructions);
+        this.mQueue = Volley.newRequestQueue(this);
+        getImageLoader(imageSource, mQueue);
 
         textViewName.setText(name);
         textViewCategory.setText(category);
         textViewInstructions.setText(instructions);
+    }
+
+    private void getImageLoader(String imageSource, RequestQueue mQueue) {
+        ImageLoader imageLoader = new ImageLoader(mQueue, new ImageLoader.ImageCache() {
+            private final LruCache<String, Bitmap> cache = new LruCache<>(20);
+            @Override
+            public Bitmap getBitmap(String url) {
+                return cache.get(url);
+            }
+
+            @Override
+            public void putBitmap(String url, Bitmap bitmap) {
+                cache.put(url, bitmap);
+            }
+        });
+        setImage(imageSource, imageLoader);
+    }
+
+    private void setImage(String imageSource, ImageLoader imageLoader){
+        NetworkImageView imageViewImage = findViewById(R.id.cocktail_image);
+        imageViewImage.setImageUrl(imageSource, imageLoader);
     }
 
     private void requestStoragePermission() {

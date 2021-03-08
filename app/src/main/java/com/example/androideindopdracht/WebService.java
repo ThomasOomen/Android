@@ -1,9 +1,17 @@
 package com.example.androideindopdracht;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
 import android.util.LruCache;
 import android.widget.ImageView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -18,15 +26,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class WebService<mQueue> {
 
-    CocktailFragment fragment;
-    ArrayList<Cocktail> cocktailData = new ArrayList<>();
+    private CocktailFragment fragment;
+    private ArrayList<Cocktail> cocktailData = new ArrayList<>();
+    private Context context;
 
-    public WebService(CocktailFragment fragment) {
+    public WebService(CocktailFragment fragment, Context context) {
         this.fragment = fragment;
+        this.context = context;
     }
 
     public void jsonParse(String query, RequestQueue mQueue) {
@@ -45,18 +58,41 @@ public class WebService<mQueue> {
                         String strDrink = drinks.getString("strDrink");
                         String strCategory = drinks.getString("strCategory");
                         String strInstructions = drinks.getString("strInstructions");
-//                        String imageSource = drinks.getString("strDrinkThumb");
+                        String imageSourceString = drinks.getString("strDrinkThumb");
 
-                        Cocktail cocktail = new Cocktail(strDrink,
+                        ImageLoader imageLoader = new ImageLoader(mQueue, new ImageLoader.ImageCache() {
+                            private final LruCache<String, Bitmap> cache = new LruCache<>(20);
+                            @Override
+                            public Bitmap getBitmap(String url) {
+                                return cache.get(url);
+                            }
+
+                            @Override
+                            public void putBitmap(String url, Bitmap bitmap) {
+                                cache.put(url, bitmap);
+                            }
+                        });
+
+                        Cocktail cocktail = new Cocktail(
+                                strDrink,
                                 strCategory,
-                                strInstructions
-//                        imageSource
+                                strInstructions,
+                                imageSourceString,
+                                imageLoader
                         );
                         cocktailData.add(cocktail);
-
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    new AlertDialog.Builder(context)
+                            .setTitle("Geen resultaat")
+                            .setMessage("De ingevulde bestaat niet")
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .create().show();
                 }
                 fragment.setCocktailData(cocktailData);
             }

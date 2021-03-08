@@ -27,7 +27,6 @@ public class CocktailFragment extends Fragment
     }
 
     public CocktailFragment(){
-
     }
 
     @Override
@@ -39,8 +38,8 @@ public class CocktailFragment extends Fragment
 
         cocktailAdapter = new CocktailAdapter(cocktailData, context);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManagerWrapper(context, LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setAdapter(cocktailAdapter);
         return view;
     }

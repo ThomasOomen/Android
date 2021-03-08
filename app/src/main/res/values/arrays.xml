@@ -11,12 +11,11 @@
     </string-array>
 
     <string-array name="favorite_ingredients">
-        <item>Vodka</item>
-        <item>Gin</item>
-        <item>Rum</item>
+        <item>Margarita</item>
+        <item>Martini</item>
+        <item>Mojito</item>
         <item>Tequila</item>
-        <item>Wiskey</item>
-        <item>Syrup</item>
-        <item>Pineapple juice</item>
+        <item>Long Island Tea</item>
+        <item>Daiquiri</item>
     </string-array>
 </resources>

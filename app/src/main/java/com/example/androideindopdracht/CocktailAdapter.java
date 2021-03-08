@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CocktailAdapter extends RecyclerView.Adapter<ViewHolderCocktails> {
-    ArrayList cocktailData;
+    ArrayList<Cocktail> cocktailData = new ArrayList<Cocktail>();
     Context context;
 
     public CocktailAdapter(ArrayList cocktailData , Context context) {
@@ -42,6 +42,7 @@ public class CocktailAdapter extends RecyclerView.Adapter<ViewHolderCocktails> {
     public void onBindViewHolder(@NonNull ViewHolderCocktails holder, int position) {
         Cocktail cocktail = (Cocktail) cocktailData.get(position);
         holder.textView.setText(cocktail.strDrink);
+        holder.img.setImageUrl(cocktail.imageSourceString, cocktail.image);
         holder.textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,6 +55,6 @@ public class CocktailAdapter extends RecyclerView.Adapter<ViewHolderCocktails> {
 
     @Override
     public int getItemCount() {
-        return cocktailData.size();
+        return (cocktailData == null) ? 0 : cocktailData.size();
     }
 }
